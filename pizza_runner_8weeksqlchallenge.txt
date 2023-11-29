@@ -119,19 +119,20 @@ VALUES
 
 1. How many pizzas were ordered? 
 
-  SELECT COUNT(*) AS pizza_order_count
-  FROM customer_orders_temp;
+ SELECT COUNT(*) AS Total_orders
+ FROM customer_orders;
 
 2. How many unique customer orders were made? 
 
-  SELECT COUNT(DISTINCT order_id) AS unique_customer_count
-  FROM customer_orders_temp;
+  SELECT COUNT(DISTINCT order_id) AS Unique_Customerorders
+  FROM customer_orders;
 
 3. How many successful orders were delivered by each runner? 
 
-   SELECT runner_id, COUNT(order_id) AS successful_order_count
-   FROM runner_orders_temp 
-   WHERE distance != 0
+   SELECT runner_id,
+       COUNT(order_id) AS Successful_orders
+   FROM runner_orders_new
+   WHERE cancellation_adjusted IS NULL
    GROUP BY runner_id;
 
 4. How many of each type of pizza was delivered?
@@ -145,24 +146,23 @@ VALUES
 
 5. How many Vegetarian and Meatlovers were ordered by each customer? 
 
-   SELECT customer_id, pizza_name,COUNT(*) AS pizza_count
-   FROM customer_orders_temp AS C
-   JOIN pizza_names AS P
-   ON C.pizza_id=P.pizza_id
-   GROUP BY customer_id,pizza_name
-   ORDER BY customer_id ASC ;
+   SELECT co.customer_id, np.pizza_name,COUNT(*) AS pizza_count
+   FROM pizza_names AS np
+   JOIN customer_orders AS co
+   ON co.pizza_id= np.pizza_id
+   GROUP BY co.customer_id,np.pizza_name;
 
 6. What was the maximum number of pizzas delivered in a single order? 
 
   WITH max_pizza AS 
  (
-   SELECT cust.order_id,COUNT(cust.pizza_id) AS pizza_per_order
-   FROM customer_orders_temp AS cust
-   JOIN runner_orders_temp AS run
-   ON cust.order_id = run.order_id
-   GROUP BY cust.order_id
+   SELECT co.order_id,COUNT(co.pizza_id) AS pizza_order
+   FROM customer_orders AS co
+   JOIN runner_orders_new AS ro
+   ON co.order_id = roorder_id
+   GROUP BY co.order_id,co.customer_id
  )
-  SELECT MAX(pizza_per_order) AS pizza_count 
+  SELECT MAX(pizza_order) 
   FROM max_pizza
 
 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
